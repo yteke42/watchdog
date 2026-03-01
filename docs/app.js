@@ -199,6 +199,7 @@ function renderPcGrid(pcs) {
     }).length;
     onlineCount.textContent = `${online} online`;
 
+    pcs.sort((a, b) => a.pc_name.localeCompare(b.pc_name, undefined, { numeric: true }));
     pcGrid.innerHTML = pcs.map(pc => {
         const status = getStatusInfo(pc);
         const stateClass = getStateClass(pc.script_state);
@@ -335,6 +336,13 @@ closeLoginModal.addEventListener('click', () => {
 loginPwdInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendLoginCmd.click();
 });
+
+async function loginRnAccount() {
+    if (!loginTargetPc) return;
+    loginModal.style.display = 'none';
+    await sendCommand(loginTargetPc, 'login_rn');
+    toast(`🎯 RN account login sent → ${loginTargetPc}`, 'success');
+}
 
 // ─── LOG VIEWER ──────────────────────────────────────────────────────────────
 
