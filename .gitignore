@@ -1,0 +1,18 @@
+# Secrets — NEVER push this
+.env
+
+# Build artifacts
+/build
+/dist
+*.spec
+*.pyc
+__pycache__/
+
+# Logs
+*.log
+/watchdog_logs
+
+# Misc
+level_processed.png
+collected_skins.txt
+/pngs

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Monitor — Dashboard</title>
+    <meta name="description" content="Remote monitoring and control dashboard for LoL automation PCs">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ─── LOGIN SCREEN ─── -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">🖥️</div>
+                <h1>PC Monitor</h1>
+                <p>Remote Control Dashboard</p>
+            </div>
+            <form id="login-form" autocomplete="on">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="your@email.com" required autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required
+                        autocomplete="current-password">
+                </div>
+                <button type="submit" id="login-btn" class="btn-login">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loading" style="display:none;">Signing in...</span>
+                </button>
+                <div id="login-error" class="login-error" style="display:none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ─── DASHBOARD ─── -->
+    <div id="dashboard" class="dashboard" style="display:none;">
+        <!-- Header -->
+        <header class="dash-header">
+            <div class="header-left">
+                <h1>🖥️ PC Monitor</h1>
+                <span id="refresh-indicator" class="refresh-badge">Auto-refresh: 5s</span>
+            </div>
+            <div class="header-right">
+                <span id="online-count" class="online-badge">0 online</span>
+                <button id="stop-all-btn" class="btn-stop-all" onclick="stopAllWhenReady()"
+                    title="Send stop-after-game to all PCs">⏸️ Stop All When Ready</button>
+                <button id="force-hb-btn" class="btn-force-hb" onclick="forceHeartbeatAll()"
+                    title="Force all PCs to send heartbeat now">💓 Force Heartbeat</button>
+                <button id="refresh-btn" class="btn-icon" title="Refresh now">🔄Refresh</button>
+                <button id="logout-btn" class="btn-icon" title="Logout">🚪Logout</button>
+            </div>
+        </header>
+
+        <!-- PC Grid -->
+        <main id="pc-grid" class="pc-grid">
+            <!-- Cards populated by JS -->
+        </main>
+
+        <!-- Command History -->
+        <section id="command-history-section" class="command-history-section" style="display:none;">
+            <div class="section-header">
+                <h2>📋 Recent Commands</h2>
+                <button id="close-history-btn" class="btn-icon">✕</button>
+            </div>
+            <div id="command-history" class="command-history"></div>
+        </section>
+    </div>
+
+    <!-- ─── LOG VIEWER MODAL ─── -->
+    <div id="log-modal" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="log-modal-title">Logs</h2>
+                <button id="close-log-modal" class="btn-icon">✕</button>
+            </div>
+            <pre id="log-content" class="log-content"></pre>
+        </div>
+    </div>
+
+    <!-- ─── LOGIN MODAL ─── -->
+    <div id="login-modal" class="modal-overlay" style="display:none;">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h2 id="login-modal-title">Login Account</h2>
+                <button id="close-login-modal" class="btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="login-password-input">Account Password</label>
+                    <input type="text" id="login-password-input" placeholder="Enter account password...">
+                </div>
+                <button id="send-login-cmd" class="btn-action btn-primary">Send Login Command</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── ACCS EDITOR MODAL ─── -->
+    <div id="accs-modal" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="accs-modal-title">📋 ACCS.txt</h2>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button id="save-accs-btn" class="btn-action btn-primary">💾 Save</button>
+                    <button id="close-accs-modal" class="btn-icon">✕</button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding:0;">
+                <textarea id="accs-content" class="accs-textarea" spellcheck="false"
+                    placeholder="Loading ACCS.txt..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── GÜN ALDIRMA MODAL ─── -->
+    <div id="gun-modal" class="modal-overlay" style="display:none;">
+        <div class="modal" style="max-width:460px;">
+            <div class="modal-header">
+                <h2 id="gun-modal-title">📅 Gun aldirma</h2>
+                <button id="close-gun-modal" class="btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="gun-section-label">Toplu gun islemleri</p>
+                <div class="gun-buttons">
+                    <button class="btn-action btn-gun" onclick="sendGunCommand(1)">1. gunleri al</button>
+                    <button class="btn-action btn-gun" onclick="sendGunCommand(2)">2. gunleri al</button>
+                    <button class="btn-action btn-gun btn-gun-all" onclick="sendGunCommand('all')">Tum gunleri al
+                        (1+2)</button>
+                </div>
+                <hr style="border:none;border-top:1px solid var(--border-color);margin:16px 0;">
+                <p class="gun-section-label">Tek oyun</p>
+                <button class="btn-action btn-gun-yuumi" onclick="playOneYuumi()" style="width:100%;">🐱 Bir Yuumi oyunu
+                    oyna</button>
+                <hr style="border:none;border-top:1px solid var(--border-color);margin:16px 0;">
+                <button class="btn-action btn-danger btn-gun-cancel" onclick="cancelGunCommand()" style="width:100%;">⛔
+                    Gün aldırmayı iptal et (Oyun bittikten sonra durur.)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── TOAST NOTIFICATIONS ─── -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
