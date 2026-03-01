@@ -16,3 +16,4 @@ __pycache__/
 level_processed.png
 collected_skins.txt
 /pngs
+watchdog.py
