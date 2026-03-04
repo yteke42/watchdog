@@ -208,8 +208,13 @@ function renderPcGrid(pcs) {
         const accountDisplay = pc.current_account || '—';
         const lastSeen = timeAgo(pc.updated_at);
 
+        let pcCardClass = `status-${status.class}`;
+        if (pc.current_level >= 30 || pc.script_state === 'LEVEL_30_REACHED') {
+            pcCardClass += ' status-level30';
+        }
+
         return `
-        <div class="pc-card status-${status.class}" data-pc="${pc.pc_name}">
+        <div class="pc-card ${pcCardClass}" data-pc="${pc.pc_name}">
             <div class="card-top">
                 <span class="card-name">${status.icon} ${pc.pc_name}</span>
                 <span class="card-status-badge ${status.badge}">${status.label}</span>
@@ -240,12 +245,12 @@ function renderPcGrid(pcs) {
                     <button class="btn-action btn-stop-after" onclick="sendCommand('${pc.pc_name}', 'stop_after_game')" title="Stop after the current game finishes">⏸️ Stop later</button>
                 </div>
                 <div class="btn-group">
-                    <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'fetch_logs')" title="Fetch latest logs">📄 Logs</button>
+                    <button class="btn-action" onclick="openLoginModal('${pc.pc_name}')" title="Login with a different account">🔑 Login</button>
                     <button class="btn-action" onclick="openAccsModal('${pc.pc_name}')" title="View/Edit ACCS.txt">📋 ACCS</button>
                     <button class="btn-action btn-gun-open" onclick="openGunModal('${pc.pc_name}')" title="Gun aldirma - otomatik hesap isleme">📅 Gun aldirma</button>
                 </div>
                 <div class="btn-group">
-                    <button class="btn-action" onclick="openLoginModal('${pc.pc_name}')" title="Login with a different account">🔑 Login</button>
+                    <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'fetch_logs')" title="Fetch latest logs">📄 Logs</button>
                     <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'logout')" title="Logout current account">🚪 Logout</button>
                     <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'start_right')" title="Start right.exe">▶️ right.exe</button>
                 </div>
