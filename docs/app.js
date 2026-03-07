@@ -224,10 +224,12 @@ function renderPcGrid(pcs) {
                     <span class="card-detail-label">State</span>
                     <span class="card-detail-value ${stateClass}">${stateDisplay}</span>
                 </div>
+                <!-- right.exe status row (commented out)
                 <div class="card-detail">
                     <span class="card-detail-label">right.exe</span>
                     <span class="card-detail-value ${pc.right_exe_running ? 'state-in-game' : 'state-offline'}">${pc.right_exe_running ? 'Running' : 'Not running'}</span>
                 </div>
+                -->
                 <div class="card-detail">
                     <span class="card-detail-label">Account</span>
                     <span class="card-detail-value">${accountDisplay}</span>
