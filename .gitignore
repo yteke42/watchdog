@@ -21,3 +21,5 @@ watchdog.py
 login_1024.py
 logout.py
 yuumi_no_update_1024.py
+login.py
+supabase_schema_map.json
