@@ -965,3 +965,17 @@ body {
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
 }
+
+/* ─── FORCE STOP BUTTON ─── */
+.btn-force-stop {
+    background: #dc2626 !important;
+    color: white !important;
+    font-weight: 700;
+    border: 2px solid #f87171 !important;
+}
+
+.btn-force-stop:hover {
+    background: #b91c1c !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}

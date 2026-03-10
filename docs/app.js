@@ -239,12 +239,13 @@ function renderPcGrid(pcs) {
                     <span class="card-detail-label">Last seen</span>
                     <span class="card-detail-value">${lastSeen}</span>
                 </div>
+                ${pc.current_level == null ? '<div class="level-bar-container" style="visibility:hidden">' + renderLevelBar(1) + '</div>' : ''}
             </div>
             <div class="card-actions">
                 <div class="btn-group">
                     <button class="btn-action btn-primary-action" onclick="sendCommand('${pc.pc_name}', 'start_script')" title="Start the bot script">▶️ Start</button>
-                    <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'stop_script')" title="Stop the bot/yuumi script">⏹️ Stop</button>
-                    <button class="btn-action btn-stop-after" onclick="sendCommand('${pc.pc_name}', 'stop_after_game')" title="Stop after the current game finishes">⏸️ Stop later</button>
+                    <button class="btn-action" onclick="confirmCommand('${pc.pc_name}', 'stop_script', 'Stop the bot script?')" title="Stop the bot/yuumi script">⏹️ Stop</button>
+                    <button class="btn-action btn-stop-after" onclick="confirmCommand('${pc.pc_name}', 'stop_after_game', 'Stop the bot after current game?')" title="Stop after the current game finishes">⏸️ Stop later</button>
                 </div>
                 <div class="btn-group">
                     <button class="btn-action" onclick="openLoginModal('${pc.pc_name}')" title="Login with a different account">🔑 Login</button>
@@ -253,11 +254,11 @@ function renderPcGrid(pcs) {
                 </div>
                 <div class="btn-group">
                     <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'fetch_logs')" title="Fetch latest logs">📄 Logs</button>
-                    <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'logout')" title="Logout current account">🚪 Logout</button>
+                    <button class="btn-action" onclick="confirmCommand('${pc.pc_name}', 'logout', 'Logout the current account?')" title="Logout current account">🚪 Logout</button>
                     <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'start_right')" title="Start right.exe">▶️ right.exe</button>
                 </div>
                 <div class="btn-group btn-group-danger">
-                    <button class="btn-action btn-danger" onclick="confirmCommand('${pc.pc_name}', 'kill_lol', 'Kill all LoL processes?')" title="Kill LoL processes">💀 Kill LoL</button>
+                <button class="btn-action btn-danger" onclick="openKillModal('${pc.pc_name}')" title="Kill options">💀 Kill</button>
                     <button class="btn-action btn-danger" onclick="confirmCommand('${pc.pc_name}', 'restart_pc', 'Restart PC?')" title="Restart the PC">⚡ Restart</button>
                     <button class="btn-action btn-danger" onclick="confirmCommand('${pc.pc_name}', 'shutdown_pc', 'Shutdown PC?')" title="Shutdown the PC">🔌 Shutdown</button>
                 </div>
@@ -420,6 +421,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         logModal.style.display = 'none';
         loginModal.style.display = 'none';
+        killModal.style.display = 'none';
     }
 });
 
@@ -716,6 +718,66 @@ gunModal.addEventListener('click', (e) => {
     if (e.target === gunModal) {
         gunModal.style.display = 'none';
         gunCurrentPc = null;
+    }
+});
+
+// ─── KILL MODAL ─────────────────────────────────────────────────────────────
+
+const killModal = document.getElementById('kill-modal');
+const killModalTitle = document.getElementById('kill-modal-title');
+const closeKillModalBtn = document.getElementById('close-kill-modal');
+const killLolBtn = document.getElementById('kill-lol-btn');
+const forceStopBtn = document.getElementById('force-stop-btn');
+let killCurrentPc = null;
+
+function openKillModal(pcName) {
+    killCurrentPc = pcName;
+    killModalTitle.textContent = '💀 Kill — ' + pcName;
+    killModal.style.display = 'flex';
+}
+
+killLolBtn.addEventListener('click', () => {
+    if (!killCurrentPc) return;
+    killModal.style.display = 'none';
+    sendCommand(killCurrentPc, 'kill_lol');
+    killCurrentPc = null;
+});
+
+forceStopBtn.addEventListener('click', async () => {
+    if (!killCurrentPc) return;
+    const pcName = killCurrentPc;
+    killModal.style.display = 'none';
+    killCurrentPc = null;
+
+    // 1. Send force_stop command
+    await sendCommand(pcName, 'force_stop');
+
+    // 2. Also mark any 'running' commands as failed from the dashboard side
+    //    (in case watchdog is truly frozen and can't process force_stop)
+    try {
+        await sb
+            .from('pc_commands')
+            .update({ status: 'failed', result: 'Forcefully terminated by user', completed_at: new Date().toISOString() })
+            .eq('target_pc', pcName)
+            .eq('status', 'running');
+        toast(`🛑 Force stop sent + stuck commands cleared for ${pcName}`, 'success');
+    } catch (err) {
+        console.error('Failed to clear stuck commands:', err);
+    }
+
+    // 3. Refresh dashboard after a short delay
+    setTimeout(() => loadDashboard(), 2000);
+});
+
+closeKillModalBtn.addEventListener('click', () => {
+    killModal.style.display = 'none';
+    killCurrentPc = null;
+});
+
+killModal.addEventListener('click', (e) => {
+    if (e.target === killModal) {
+        killModal.style.display = 'none';
+        killCurrentPc = null;
     }
 });
 
