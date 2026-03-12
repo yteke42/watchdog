@@ -28,6 +28,12 @@ const cmdSection = document.getElementById('command-history-section');
 const cmdHistory = document.getElementById('command-history');
 const closeHistoryBtn = document.getElementById('close-history-btn');
 
+const otherModal = document.getElementById('other-modal');
+const otherModalTitle = document.getElementById('other-modal-title');
+const closeOtherModalBtn = document.getElementById('close-other-modal');
+const otherRightBtn = document.getElementById('other-right-btn');
+const otherUpdateBtn = document.getElementById('other-update-btn');
+
 let refreshTimer = null;
 let loginTargetPc = null; // which PC the login modal is for
 
@@ -255,7 +261,7 @@ function renderPcGrid(pcs) {
                 <div class="btn-group">
                     <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'fetch_logs')" title="Fetch latest logs">📄 Logs</button>
                     <button class="btn-action" onclick="confirmCommand('${pc.pc_name}', 'logout', 'Logout the current account?')" title="Logout current account">🚪 Logout</button>
-                    <button class="btn-action" onclick="sendCommand('${pc.pc_name}', 'start_right')" title="Start right.exe">▶️ right.exe</button>
+                    <button class="btn-action" onclick="openOtherModal('${pc.pc_name}')" title="Other actions (Right.exe, Update LoL)">🛠️ Other</button>
                 </div>
                 <div class="btn-group btn-group-danger">
                 <button class="btn-action btn-danger" onclick="openKillModal('${pc.pc_name}')" title="Kill options">💀 Kill</button>
@@ -422,6 +428,7 @@ document.addEventListener('keydown', (e) => {
         logModal.style.display = 'none';
         loginModal.style.display = 'none';
         killModal.style.display = 'none';
+        otherModal.style.display = 'none';
     }
 });
 
@@ -778,6 +785,42 @@ killModal.addEventListener('click', (e) => {
     if (e.target === killModal) {
         killModal.style.display = 'none';
         killCurrentPc = null;
+    }
+});
+
+// ─── OTHER MODAL ─────────────────────────────────────────────────────────────
+
+let otherCurrentPc = null;
+
+function openOtherModal(pcName) {
+    otherCurrentPc = pcName;
+    otherModalTitle.textContent = '🛠️ Other Actions — ' + pcName;
+    otherModal.style.display = 'flex';
+}
+
+otherRightBtn.addEventListener('click', () => {
+    if (!otherCurrentPc) return;
+    otherModal.style.display = 'none';
+    sendCommand(otherCurrentPc, 'start_right');
+    otherCurrentPc = null;
+});
+
+otherUpdateBtn.addEventListener('click', () => {
+    if (!otherCurrentPc) return;
+    otherModal.style.display = 'none';
+    sendCommand(otherCurrentPc, 'update_game');
+    otherCurrentPc = null;
+});
+
+closeOtherModalBtn.addEventListener('click', () => {
+    otherModal.style.display = 'none';
+    otherCurrentPc = null;
+});
+
+otherModal.addEventListener('click', (e) => {
+    if (e.target === otherModal) {
+        otherModal.style.display = 'none';
+        otherCurrentPc = null;
     }
 });
 
