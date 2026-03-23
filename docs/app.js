@@ -260,7 +260,7 @@ function renderPcGrid(pcs) {
             <div class="card-details">
                 <div class="card-detail">
                     <span class="card-detail-label">State</span>
-                    <span class="card-detail-value ${stateClass}">${stateDisplay}${pc.state_changed_at && pc.is_online ? ' <span class="state-timer' + (isStateOverdue(pc) ? ' overdue' : '') + '">' + stateTimer(pc) + '</span>' : ''}</span>
+                    <span class="card-detail-value ${stateClass}">${pc.state_changed_at && pc.is_online ? '<span class="state-timer' + (isStateOverdue(pc) ? ' overdue' : '') + '">' + stateTimer(pc) + '</span> ' : ''}${stateDisplay}</span>
                 </div>
                 <!-- right.exe status row (commented out)
                 <div class="card-detail">
