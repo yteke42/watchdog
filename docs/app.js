@@ -153,6 +153,38 @@ function timeAgo(dateStr) {
     return `${Math.floor(hours / 24)}d ago`;
 }
 
+// Max allowed minutes per state
+const STATE_MAX_MINUTES = {
+    'IDLE': 6,
+    'IN_QUEUE': 60,
+    'CHAMP_SELECT': 11,
+    'LOADING_SCREEN': 11,
+    'IN_GAME': 60,
+    'POST_GAME': 10,
+    'LOOP_END': 10
+};
+
+function stateTimer(pc) {
+    if (!pc.state_changed_at) return '';
+    const diff = Date.now() - new Date(pc.state_changed_at).getTime();
+    if (diff < 0) return '0s';
+    const totalSecs = Math.floor(diff / 1000);
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    if (hrs > 0) return `${hrs}h ${mins}m`;
+    if (mins > 0) return `${mins}m ${secs}s`;
+    return `${secs}s`;
+}
+
+function isStateOverdue(pc) {
+    if (!pc.state_changed_at || !pc.script_state) return false;
+    const maxMin = STATE_MAX_MINUTES[pc.script_state.toUpperCase()];
+    if (!maxMin) return false;
+    const elapsedMs = Date.now() - new Date(pc.state_changed_at).getTime();
+    return elapsedMs > maxMin * 60 * 1000;
+}
+
 function renderLevelBar(level) {
     const capped = Math.min(level, 30);
     const isComplete = level >= 30;
@@ -228,7 +260,7 @@ function renderPcGrid(pcs) {
             <div class="card-details">
                 <div class="card-detail">
                     <span class="card-detail-label">State</span>
-                    <span class="card-detail-value ${stateClass}">${stateDisplay}</span>
+                    <span class="card-detail-value ${stateClass}">${stateDisplay}${pc.state_changed_at && pc.is_online ? ' <span class="state-timer' + (isStateOverdue(pc) ? ' overdue' : '') + '">' + stateTimer(pc) + '</span>' : ''}</span>
                 </div>
                 <!-- right.exe status row (commented out)
                 <div class="card-detail">
