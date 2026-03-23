@@ -730,12 +730,17 @@ async function forceHeartbeatAll() {
             toast('No online PCs found', 'warning');
             return;
         }
-        for (const pc of pcs) {
-            await sendCommand(pc.pc_name, 'force_heartbeat');
-        }
+        // Silently insert all heartbeat commands at once (no per-PC toast)
+        const cmds = pcs.map(pc => ({
+            target_pc: pc.pc_name,
+            command: 'force_heartbeat',
+            status: 'pending'
+        }));
+        const { error } = await sb.from('pc_commands').insert(cmds);
+        if (error) throw error;
         toast(`💓 Heartbeat requested from ${pcs.length} PCs. Refreshing...`, 'success');
         // Auto-refresh after a short delay to show updated data
-        setTimeout(() => loadPCs(), 2000);
+        setTimeout(() => loadDashboard(), 2000);
     } catch (err) {
         toast('Failed: ' + err.message, 'error');
     }
