@@ -161,7 +161,8 @@ const STATE_MAX_MINUTES = {
     'LOADING_SCREEN': 11,
     'IN_GAME': 60,
     'POST_GAME': 10,
-    'LOOP_END': 10
+    'LOOP_END': 10,
+    'LOGGING IN': 10
 };
 
 function stateTimer(pc) {
