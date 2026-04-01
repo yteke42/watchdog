@@ -34,6 +34,20 @@ const closeOtherModalBtn = document.getElementById('close-other-modal');
 const otherRightBtn = document.getElementById('other-right-btn');
 const otherUpdateBtn = document.getElementById('other-update-btn');
 
+// PC → Region mapping (keys are lowercase for case-insensitive lookup)
+const PC_REGION_MAP = {
+    'pc1': 'EUW',
+    'pc5': 'EUW',
+    'pc2': 'TR',
+    'pc4': 'TR',
+    'pc10': 'TR'
+};
+
+function getRegionSuffix(pcName) {
+    const region = PC_REGION_MAP[(pcName || '').toLowerCase()];
+    return region ? ` (${region})` : '';
+}
+
 let refreshTimer = null;
 let loginTargetPc = null; // which PC the login modal is for
 
@@ -255,7 +269,7 @@ function renderPcGrid(pcs) {
         return `
         <div class="pc-card ${pcCardClass}" data-pc="${pc.pc_name}">
             <div class="card-top">
-                <span class="card-name">${status.icon} ${pc.pc_name}</span>
+                <span class="card-name">${status.icon} ${pc.pc_name}${getRegionSuffix(pc.pc_name)}</span>
                 <span class="card-status-badge ${status.badge}">${status.label}</span>
             </div>
             <div class="card-details">
