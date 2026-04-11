@@ -37,9 +37,13 @@ const otherUpdateBtn = document.getElementById('other-update-btn');
 // PC → Region mapping (keys are lowercase for case-insensitive lookup)
 const PC_REGION_MAP = {
     'pc1': 'TR',
-    'pc5': 'EUW',
     'pc2': 'TR',
+    'pc3': 'EUW',
     'pc4': 'TR',
+    'pc5': 'EUW',
+    'pc6': 'TR',
+    'pc8': 'EUW',
+    'pc9': 'EUW',
     'pc10': 'TR'
 };
 
