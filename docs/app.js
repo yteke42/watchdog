@@ -38,7 +38,7 @@ const otherUpdateBtn = document.getElementById('other-update-btn');
 const PC_REGION_MAP = {
     'pc1': 'TR',
     'pc2': 'TR',
-    'pc3': 'EUW',
+    'pc3': 'TR',
     'pc4': 'TR',
     'pc5': 'EUW',
     'pc6': 'TR',
